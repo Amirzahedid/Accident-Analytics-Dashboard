@@ -395,11 +395,18 @@ function filterByUncertainty(data) {
 // تابع جدید برای اختصاص رنگ بر اساس مقیاس D3
 
 function getColorForSicherheit(score, isCorrect) {
+    const minUnsicherheit = 0.289547519; // حداقل مقدار Unsicherheit
+    const maxUnsicherheit = 0.9924692;  // حداکثر مقدار Unsicherheit
+
+    // نرمال‌سازی مقادیر به بازه [0, 1]
+    const normalizedScore = (score - minUnsicherheit) / (maxUnsicherheit - minUnsicherheit);
+
     const colorScale = d3.scaleSequential()
-        .domain([0, 1]) // دامنه داده‌ها
+        .domain([0, 1]) // دامنه داده‌ها پس از نرمال‌سازی
         .interpolator(d3.interpolateMagma); // استفاده از مقیاس رنگی Magma
-    const reverseScore = 1 - score;
-    const baseColor = colorScale(reverseScore); // تولید رنگ براساس score
+
+    const reverseScore = 1 - normalizedScore; // معکوس کردن مقدار برای رنگ‌های مناسب
+    const baseColor = colorScale(reverseScore); // تولید رنگ براساس normalizedScore
 
     // در صورت اشتباه بودن پیش‌بینی، کمی تیره‌تر می‌کنیم
     return isCorrect ? baseColor : lightenDarkenColor(baseColor, -15);
