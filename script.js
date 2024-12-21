@@ -2,12 +2,17 @@
 let filterOptions;
 
 const initializeMap = () => {
-    const map = L.map("map").setView([50.0, 8.25], 12);
+    const map = L.map("map", {
+        center: [50.0, 8.25], // مرکز نقشه
+        zoom: 12,             // سطح زوم اولیه
+        maxZoom: 19,          // حداکثر سطح زوم
+        minZoom: 5,           // حداقل سطح زوم (اختیاری)
+    });
 
     // Add OpenStreetMap tiles
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
-        maxZoom: 18,
+        maxZoom: 19,
     }).addTo(map);
 
     return map;
@@ -693,7 +698,7 @@ function updateMap(filteredData, classType) {
     // افزودن لایه جدید OpenStreetMap
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
-        maxZoom: 18,
+        maxZoom: 19,
     }).addTo(map);
 
     if (!filteredData || filteredData.length === 0) {
@@ -703,9 +708,12 @@ function updateMap(filteredData, classType) {
 
     // ایجاد گروه خوشه‌بندی
     const markers = L.markerClusterGroup({
+        disableClusteringAtZoom: 18,
         showCoverageOnHover: false,
         zoomToBoundsOnClick: true,
-        maxClusterRadius: 50, // شعاع خوشه
+        maxClusterRadius: 40, // شعاع خوشه
+        spiderfyOnMaxZoom: true, // نمایش نقاط به صورت مجزا در بیشترین زوم
+        maxZoom: 19, // تنظیم حداکثر زوم
         iconCreateFunction: function (cluster) {
             const count = cluster.getChildCount();
             const size = count < 10 ? 30 : count < 50 ? 40 : 50; // تنظیم اندازه خوشه
