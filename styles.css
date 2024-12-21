@@ -1,0 +1,837 @@
+/* تنظیمات کلی برای نقشه تمام صفحه */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: "Arial", sans-serif;
+    overflow: hidden; /* جلوگیری از اسکرول */
+}
+
+#map {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: "Arial", sans-serif;
+    overflow: hidden; /* جلوگیری از اسکرول */
+    z-index: 1;
+}
+#filters-panel {
+
+    z-index: 200;
+}
+
+.floating-panel-settings {
+    position: absolute;
+    top: 80px;
+    right: 10px;  /* تغییر از left به right */
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    width: 280px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    z-index: 200;
+}
+
+
+/* پنل‌های شناور روی نقشه */
+.floating-panel {
+    position: absolute;
+    top: 140px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    width: 280px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    z-index: 200;
+}
+
+
+/* دکمه باز و بسته کردن پنل */
+.panel-toggle {
+    background: #d70000;
+    color: rgb(255, 0, 0);
+    border: #ccc;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    left: -50px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.panel-toggle:hover {
+    background: #005bb5;
+    transform: scale(1.1); /* بزرگ شدن هنگام هاور */
+}
+
+/* محتوای داخلی پنل */
+.panel-content {
+    display: none; /* در ابتدا مخفی */
+    flex-direction: column;
+    gap: 10px;
+}
+
+.floating-panel.open .panel-content {
+    display: flex; /* نمایش محتوای پنل هنگام باز شدن */
+}
+
+/* عنوان پنل‌ها */
+.floating-panel h3 {
+    margin: 0 0 12px;
+    color: #222;
+    font-size: 1rem;
+}
+
+/* برچسب‌ها */
+.floating-panel label {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+/* استایل ورودی رنج */
+.floating-panel input[type="range"] {
+    width: 100%;
+    appearance: none;
+    height: 6px;
+    background: #ddd;
+    outline: none;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+
+.floating-panel input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #0078d7;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.floating-panel input[type="range"]::-webkit-slider-thumb:hover {
+    background: #005bb5;
+}
+
+/* دکمه‌های اولیه */
+.btn-primary {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px); /* حرکت کوچک به بالا */
+}
+
+/* انیمیشن باز شدن پنل */
+.floating-panel.open {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* حالت پیش‌فرض پنل بسته */
+.floating-panel {
+    transform: translateX(-280px);
+    opacity: 0.8;
+}
+
+.floating-panel:hover {
+    opacity: 1;
+}
+
+/* استایل‌های فرم‌ها */
+label {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 5px;
+}
+
+select,
+button {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #005bb5;
+}
+
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    padding: 20px;
+    width: 80%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Close Button */
+.modal .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.modal .close:hover {
+    color: red;
+}
+
+/* Chart Container */
+#shap-chart-container {
+    width: 100%;
+    height: 500px;
+}
+
+
+
+
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* رنگ تیره با شفافیت */
+    z-index: 1000; /* بالاتر از همه عناصر */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* بالاتر از overlay */
+    padding: 20px;
+    width: 80%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.close {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    z-index: 1000;
+}
+
+.modal .close {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+
+.modal .close:hover {
+    color: black;
+}
+
+.close:hover {
+    color: red;
+}
+
+/* .modal .close:hover,
+.modal .close:focus {
+    color: black;
+    text-decoration: none;
+} */
+
+/* SHAP Chart Container */
+#shap-chart-container {
+    width: 100%;
+    height: 500px; /* فضای مناسب برای نمودار */
+}
+
+#shap-chart-container svg text {
+    font-size: 12px; /* کوچک کردن فونت */
+}
+
+#shap-chart-container rect {
+    rx: 5px; /* گرد کردن گوشه‌های میله‌ها */
+}
+
+/* SHAP Chart Layout */
+#shap-charts {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.grid line {
+    stroke: #ddd; /* رنگ خطوط */
+    stroke-dasharray: 3; /* خطوط نقطه‌چین */
+}
+
+.grid path {
+    stroke-width: 0; /* حذف خط اصلی محور */
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1001; /* بزرگتر از z-index مدال و overlay */
+}
+
+#color-legend {
+    width: 300px;
+    height: 20px;
+    margin: 10px 0;
+    z-index: 200;
+}
+
+
+/* استایل کلی برای لیست Active Filters */
+#active-filters {
+    list-style: none; /* حذف نقطه‌های پیش‌فرض لیست */
+    padding: 0;
+    margin: 0;
+}
+
+/* کانتینر برای دسته‌بندی فیلترها */
+.filter-category-container {
+    display: flex; /* نمایش افقی */
+    flex-wrap: wrap; /* امکان ایجاد چند خط در صورت کمبود فضا */
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px; /* فاصله بین عناصر */
+    font-size: 0.9rem;
+}
+
+/* عنوان دسته‌بندی (مانند ISTRAD) */
+.filter-category-container strong {
+    margin-right: 5px;
+    color: #333; /* رنگ متن */
+    font-size: 1rem;
+}
+
+/* استایل برای هر مقدار فیلتر و دکمه حذف */
+.filter-value-item {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* فاصله بین مقدار و دکمه حذف */
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* دکمه حذف */
+.remove-value-button {
+    background-color: #e74c3c; /* رنگ قرمز */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.remove-value-button:hover {
+    background-color: #c0392b; /* تغییر رنگ هنگام هاور */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.hover-bestimmt {
+    background-color: inherit; /* رنگ از جاوااسکریپت به ارث می‌رسد */
+    opacity: 1; /* اطمینان از شفاف نبودن */
+    border: 1px solid #aaa; /* حاشیه نازک برای وضوح بیشتر */
+    border-radius: 5px; /* گوشه‌های گرد */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* سایه خفیف برای برجستگی */
+    height: 10px;
+}
+
+div.hover-bestimmt {
+    background-color: transparent; /* پیش‌فرض خالی نباشد */
+}
+
+
+
+.custom-marker {
+    background-color: var(--bg-color, #f0f0f0); /* رنگ پس‌زمینه با مقدار پیش‌فرض */
+    color: var(--text-color, white); /* رنگ متن */
+    border-radius: 50%; /* دایره‌ای */
+    width: 28px; /* بزرگ‌تر ولی متناسب */
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* سایه برای خوانایی بهتر */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* سایه برای برجسته‌تر کردن نقاط */
+    border: 1.5px solid rgba(0, 0, 0, 0.5); /* حاشیه نیمه‌شفاف */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* افکت هاور */
+.custom-marker:hover {
+    transform: scale(1.2); /* بزرگ‌تر شدن در حالت هاور */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* برجسته‌تر در حالت هاور */
+    cursor: pointer; /* نشانگر موس */
+}
+
+
+/* Radio Btn */
+
+/* پنل کلی */
+.floating-radio {
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 10px 20px;
+    width: auto;
+    z-index: 200;
+    display: flex;
+    justify-content: center; /* قرارگیری عناصر در مرکز */
+    align-items: center;
+    gap: 10px; /* فاصله بین دکمه‌ها */
+    font-family: "Arial", sans-serif;
+    transition: all 0.3s ease-in-out;
+}
+
+/* استایل کلی رادیو باتن */
+.custom-radio {
+    display: inline-flex; /* قرارگیری دکمه‌ها در کنار هم */
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.2s ease-in-out;
+}
+
+.custom-radio input {
+    display: none; /* مخفی کردن رادیو باتن */
+}
+
+.custom-radio .radio-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px; /* عرض دکمه */
+    height: 40px; /* ارتفاع دکمه */
+    border-radius: 20px;
+    background-color: #e0e0e0; /* رنگ پیش‌فرض */
+    color: #555;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* حالت انتخاب‌شده */
+.custom-radio input:checked + .radio-label {
+    background-color: #0078d7;
+    color: white;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+/* افکت هاور */
+.custom-radio .radio-label:hover {
+    background-color: #d4d4d4;
+    color: #333;
+}
+
+
+
+
+/* Filter */
+
+/* استایل کلی برای پنل شناور */
+.floating-panel {
+    position: absolute;
+    top: 150px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    width: 300px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transition: all 0.3s ease-in-out;
+    z-index: 200;
+    font-family: "Arial", sans-serif;
+}
+
+/* عنوان‌های داخل پنل */
+.floating-panel h2,
+.floating-panel h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #0078d7;
+    padding-bottom: 5px;
+}
+
+/* برچسب‌های فیلتر */
+.floating-panel label {
+    font-weight: bold;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+}
+
+/* استایل Dropdown ها */
+.floating-panel select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+    background-color: #fff;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.floating-panel select:focus {
+    outline: none;
+    border-color: #0078d7;
+    box-shadow: 0 0 5px rgba(0, 120, 215, 0.4);
+}
+
+/* دکمه افزودن فیلتر */
+#add-filter {
+    background-color: #0078d7;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    font-size: 1rem;
+    transition: background-color 0.3s ease-in-out;
+}
+
+#add-filter:hover {
+    background-color: #005bb5;
+}
+
+/* لیست فیلترهای فعال */
+#active-filters {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#active-filters li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    background-color: #f4f4f4;
+    border-radius: 6px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+}
+
+#active-filters li button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#active-filters li button:hover {
+    background-color: #e60000;
+}
+
+/* شمارش امتیازات */
+#filtered-count {
+    margin-top: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #0078d7;
+    text-align: center;
+}
+
+
+
+/* Sicherheit*/
+
+/* پنل تنظیمات شناور */
+.floating-panel-settings {
+    position: absolute;
+    top: 80px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    width: 300px;
+    transition: all 0.3s ease-in-out;
+    font-family: "Arial", sans-serif;
+    z-index: 200;
+}
+
+/* عنوان‌های پنل */
+.floating-panel-settings h2,
+.floating-panel-settings h3 {
+    margin: 0 0 15px;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-bottom: 2px solid #0078d7;
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+/* پاراگراف‌های توضیح */
+.floating-panel-settings p {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+/* استایل کلی برای رنج اسلایدر */
+.floating-panel-settings input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+    margin: 10px 0;
+    transition: background 0.3s;
+}
+
+.floating-panel-settings input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #0078d7;
+    border: 1px solid #005bb5;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.floating-panel-settings input[type="range"]::-webkit-slider-thumb:hover {
+    background: #005bb5;
+    transform: scale(1.1);
+}
+
+/* تنظیم فاصله بین اسلایدرها */
+.sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* نمایش مقدار thresholds به صورت پررنگ */
+#low-threshold-value,
+#high-threshold-value {
+    font-weight: bold;
+    color: #0078d7;
+    font-size: 1rem;
+}
+
+/* استایل برای Color Gradient */
+.color-legend {
+    margin: 10px auto;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 50%,
+        #00ff00 100%
+    ); /* گرادیان رنگ */
+}
+
+
+/* punk Wahr */
+/* کلاس عمومی برای مارکرها */
+.enhanced-marker {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* سایه برای برجسته‌تر شدن */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* نرم شدن انیمیشن */
+    transform-origin: center center; /* تغییر اندازه از مرکز */
+}
+
+.enhanced-marker:hover {
+    transform: scale(1.15) translateZ(0); /* جلوگیری از تکان خوردن با translateZ */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4); /* افزایش سایه */
+}
+
+/* جلوگیری از تداخل Leaflet */
+.leaflet-interactive {
+    box-shadow: none; /* حذف سایه پیش‌فرض */
+    animation: none; /* حذف انیمیشن پیش‌فرض */
+    transition: none; /* جلوگیری از انیمیشن‌های ناخواسته */
+}
+
+/* استایل مارکر‌های سفارشی */
+.custom-marker {
+    background-color: var(--bg-color, #f0f0f0);
+    color: var(--text-color, white);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(0, 0, 0, 0.5);
+    position: relative; /* ثابت نگه داشتن موقعیت */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.custom-marker:hover {
+    transform: scale(1.2) translateZ(0); /* جلوگیری از لرزش */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); /* سایه بیشتر هنگام هاور */
+    cursor: pointer;
+}
+
+
+/* Overlay برای modal جدید */
+.modal-overlay-pie {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+}
+
+
+.legend-item {
+    display: flex; /* تنظیم برای قرار دادن مربع و متن در یک خط */
+    align-items: center; /* تنظیم تراز عمودی مربع و متن */
+    margin: 10px 0; /* فاصله بین آیتم‌ها */
+}
+.square {
+    width: 20px; /* اندازه مربع */
+    height: 20px;
+    margin-right: 10px; /* فاصله مربع از متن */
+}
+.red {
+    background-color: #D70000;
+}
+.orange {
+    background-color: #FF8C00;
+}
+.yellow {
+    background-color: #FFF700;
+}
+
+.unfall-klasse-map {
+    font-size: 14px;
+    font-weight: bold;
+}

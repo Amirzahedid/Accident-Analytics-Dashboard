@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Verkehrsunfall-Dashboard</title>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+            crossorigin=""
+        />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <svg width="0" height="0" style="position: absolute">
+            <defs>
+                <!-- گرادیانت برای شدت Fatal -->
+                <linearGradient id="fatalGradient" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#FF4D4D" />
+                    <stop offset="100%" stop-color="#FF0000" />
+                </linearGradient>
+
+                <!-- گرادیانت برای شدت Severe -->
+                <linearGradient id="severeGradient" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#FFC04D" />
+                    <stop offset="100%" stop-color="#FF8C00" />
+                </linearGradient>
+
+                <!-- گرادیانت برای شدت Light -->
+                <linearGradient id="lightGradient" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#FFFFA8" />
+                    <stop offset="100%" stop-color="#FFFF00" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- نقشه تمام صفحه -->
+        <div id="map"></div>
+
+        <!-- پنل فیلترها -->
+        <!-- فیلترها در پنل شناور -->
+        <!-- پنل تنظیمات -->
+        <section id="radio-btn" class="floating-radio">
+            <div class="radio-container">
+                <label class="custom-radio">
+                    <input type="radio" id="toggle-wahr" name="class-type" />
+                    <span class="radio-label">Wahr</span>
+                </label>
+                <label class="custom-radio">
+                    <input
+                        type="radio"
+                        id="toggle-bestimmt"
+                        name="class-type"
+                    />
+                    <span class="radio-label">Bestimmt</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section id="filters" class="floating-panel open" style="display: none">
+            <!-- Toggle Switch for Class Selection -->
+            <!-- Two Toggle Switches -->
+            <h2>Dynamische Filter</h2>
+            <!-- First dropdown for filter category -->
+            <label for="filter-category">Filter Kategorie:</label>
+            <select id="filter-category">
+                <option value="" selected>List of Filters</option>
+                <option value="year">Year</option>
+                <option value="month">Month</option>
+                <option value="istRad">IstRad (Bicycle)</option>
+                <option value="istPkw">IstPkw (Car)</option>
+                <option value="istFuss">IstFuss (Foot)</option>
+                <option value="istKrad">IstKrad (Motorbike)</option>
+                <option value="istSonstiges">IstSonstiges (Other)</option>
+                <option value="stunde">Stunde (Hour)</option>
+                <option value="unfalart">Unfallart (Accident Type)</option>
+                <option value="unfaltyp">Unfalltyp (Accident Category)</option>
+                <option value="lichtverhältnisse">
+                    Lichtverhältnisse (Lighting Conditions)
+                </option>
+                <option value="straßenverhältnisse">
+                    Straßenverhältnisse (Road Conditions)
+                </option>
+                <option value="straßenart">Straßenart (Road Type)</option>
+                <option value="stadtteil">Stadtteil (City District)</option>
+            </select>
+
+            <!-- Second dropdown for filter values -->
+            <label for="filter-value">Filterwert:</label>
+            <select id="filter-value">
+                <option value="" disabled selected>
+                    Bitte zuerst einen Filter auswählen
+                </option>
+            </select>
+
+            <!-- Add filter button -->
+            <button id="add-filter">Filter hinzufügen</button>
+
+            <!-- List of active filters -->
+            <h3>Aktiven Filter:</h3>
+            <ul id="active-filters">
+                <!-- Active filters will be dynamically added here -->
+            </ul>
+
+            <!-- Section for displaying filtered count -->
+            <p id="filtered-count">Gesamtpunkte: 0</p>
+            <br />
+            <div id="map-farbe" style="display: none;">
+                <div class="legend-item">
+                    <div class="square red"></div>
+                    <span class="unfall-klasse-map">Unfall mit Getöteten (Klasse 0)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="square orange"></div>
+                    <span class="unfall-klasse-map">Unfall mit Schwerverletzten (Klasse 1)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="square yellow"></div>
+                    <span class="unfall-klasse-map">Unfall mit Leichtverletzten (Klasse 2)</span>
+                </div>
+            </div>
+        </section>
+
+        <section
+            id="safety-settings"
+            class="floating-panel-settings"
+            style="display: none"
+        >
+            <h2>Einstellungen zur Unsicherheit bei Vorhersagen</h2>
+            <p>
+                Aktuelle Unsicherheitsgrenzen: <br />
+                Niedrig =
+                <span id="low-threshold-value">0%</span>, Hoch =
+                <span id="high-threshold-value">100%</span>
+            </p>
+
+            <div class="sliders">
+                <div>
+                    <label for="low-threshold">Niedrige Schwelle: </label>
+                    <input
+                        id="low-threshold"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="0"
+                    />
+                    <!-- <span id="low-threshold-value">0%</span> -->
+                </div>
+                <div>
+                    <label for="high-threshold">Hohe Schwelle: </label>
+                    <input
+                        id="high-threshold"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="100"
+                    />
+                    <!-- <span id="high-threshold-value">100%</span> -->
+                </div>
+            </div>
+            <h3>Farbverlauf für Unsicherheits-Score</h3>
+            <div
+                id="color-legend"
+                class="color-legend"
+                style="width: 300px; height: 20px"
+            ></div>
+        </section>
+        <!-- Overlay -->
+        <div id="modal-overlay" class="modal-overlay"></div>
+
+        <!-- Modal -->
+        <div id="shap-modal" class="modal">
+            <span id="modal-close" class="close">&times;</span>
+            <h2>SHAP-Werte für alle Klassen</h2>
+            <div id="shap-chart-container">
+                <!-- Chart content will be dynamically added here -->
+            </div>
+        </div>
+        <!-- Modal برای نمایش اطلاعات -->
+        <div id="modal-overlay" class="modal-overlay"></div>
+        <div id="shap-modal" class="modal">
+            <span id="modal-close" class="close">&times;</span>
+            <h2>SHAP-Werte für alle Klassen</h2>
+            <div id="shap-chart-container">
+                <!-- نمودار اینجا اضافه می‌شود -->
+            </div>
+        </div>
+        <!-- لینک به کتابخانه‌های ضروری -->
+        <script
+            src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""
+        ></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
