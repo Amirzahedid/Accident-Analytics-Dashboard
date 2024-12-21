@@ -1249,11 +1249,9 @@ function createMarker(latLng, item, classType) {
                 className: "custom-icon",
                 html: `<div class="custom-marker" style="
                     --bg-color: ${color};
-                    --text-color: ${isCorrect ? "black" : "white"};
                     border: 2px solid ${isCorrect ? "#00FF00" : "#FF0000"};
                     font-size: 14px;
                     font-weight: bold;">
-                    ${isCorrect ? "+" : "-"}
                 </div>`,
                 iconSize: [28, 28],
                 iconAnchor: [14, 14],
@@ -1261,7 +1259,34 @@ function createMarker(latLng, item, classType) {
         });
     }
     if (classType){
-        marker.bindTooltip(generateTooltip(item, classType), { direction: "top" });
+        marker.bindTooltip(generateTooltip(item, classType), {permanent: false, direction: "top" });
+        marker.on("click", () => {
+            // استخراج SHAP Values برای همه کلاس‌ها
+            const shapValuesClass0 = extractSHAPValues(item, 0).shapValues;
+            const shapValuesClass1 = extractSHAPValues(item, 1).shapValues;
+            const shapValuesClass2 = extractSHAPValues(item, 2).shapValues;
+            
+            // باز کردن مودال
+            showSHAPModal(item);
+            
+            // اطمینان از آماده بودن DOM قبل از رسم نمودار
+            const checkContainer = setInterval(() => {
+                const container = document.getElementById(
+                "shap-chart-container"
+                );
+                if (container) {
+                    clearInterval(checkContainer); // متوقف کردن بررسی
+                    
+                    // رسم نمودار برای همه کلاس‌ها در مودال
+                    renderGroupedSHAPGraph(
+                    shapValuesClass0,
+                    shapValuesClass1,
+                    shapValuesClass2,
+                    "shap-chart-container"
+                    );
+                }
+            }, 50); // بررسی هر 50 میلی‌ثانیه برای آماده بودن DOM
+        });
     }
     
     return marker;
@@ -1281,14 +1306,54 @@ function generateTooltip(item, classType) {
     } else if(classType === "bestimmt"){
         const wahrValue = item["Unfallklasse Wahr"];
         const bestimmtValue = item["Unfallklasse Bestimmt"];
+        const isCorrect = wahrValue === bestimmtValue;
         const sicherheitScore = parseFloat(item["Unsicherheits-Score"]);
-        return `
-            <div>
-                <strong>Jahr:</strong> ${item.Jahr}<br>
-                <strong>Monat:</strong> ${item.Monat}<br>
-                <strong>Wahr:</strong> ${wahrValue}<br>
-                <strong>Bestimmt:</strong> ${bestimmtValue}<br>
-                <strong>Unsicherheits:</strong> ${sicherheitScore.toFixed(2)}<br>
+        const class0Prob =
+            safeParseFloat(item["Wahrscheinlichkeit Klasse 0"]) / 100;
+        const class1Prob =
+            safeParseFloat(item["Wahrscheinlichkeit Klasse 1"]) / 100;
+        const class2Prob =
+            safeParseFloat(item["Wahrscheinlichkeit Klasse 2"]) / 100;
+        return  `
+            <strong>Jahr:</strong> ${item.Jahr}<br>
+            <strong>Monat:</strong> ${item.Monat}<br>
+            <strong>Wahr:</strong> ${wahrValue}<br>
+            <strong>Bestimmt:</strong> ${bestimmtValue}<br>
+            <strong>Unsicherheits:</strong> ${sicherheitScore.toFixed(2)}<br>
+            <strong>Treffer:</strong> ${isCorrect ? "Korrekt" : "InKorrekt"}
+            <br>
+            <div style="font-size: 12px; width: 280px;">
+                <div>
+                    <strong>Klasse 0:</strong>
+                    <div class='hover-bestimmt' style="
+                        display: inline-block; 
+                        background-color: ${getGrayShade(class0Prob)};
+                        height: 10px; 
+                        width: ${class0Prob * 100}%; 
+                        max-width: 100%; 
+                        border-radius: 3px;">
+                    </div> ${Math.round(class0Prob * 100)}%
+                    <br>
+                    <strong>Klasse 1:</strong>
+                    <div class='hover-bestimmt' style="
+                        display: inline-block; 
+                        background-color: ${getGrayShade(class1Prob)};
+                        height: 10px; 
+                        width: ${class1Prob * 100}%; 
+                        max-width: 100%; 
+                        border-radius: 3px;">
+                    </div> ${Math.round(class1Prob * 100)}%
+                    <br>
+                    <strong>Klasse 2:</strong>
+                    <div class='hover-bestimmt' style="
+                        display: inline-block; 
+                        background-color: ${getGrayShade(class2Prob)};
+                        height: 10px; 
+                        width: ${class2Prob * 100}%; 
+                        max-width: 100%; 
+                        border-radius: 3px;">
+                    </div> ${Math.round(class2Prob * 100)}%
+                </div>
             </div>
         `;
     }
