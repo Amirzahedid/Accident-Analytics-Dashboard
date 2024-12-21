@@ -10,6 +10,14 @@
             integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
             crossorigin=""
         />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+        />
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
@@ -107,18 +115,24 @@
             <!-- Section for displaying filtered count -->
             <p id="filtered-count">Gesamtpunkte: 0</p>
             <br />
-            <div id="map-farbe" style="display: none;">
+            <div id="map-farbe" style="display: none">
                 <div class="legend-item">
                     <div class="square red"></div>
-                    <span class="unfall-klasse-map">Unfall mit Getöteten (Klasse 0)</span>
+                    <span class="unfall-klasse-map"
+                        >Unfall mit Getöteten (Klasse 0)</span
+                    >
                 </div>
                 <div class="legend-item">
                     <div class="square orange"></div>
-                    <span class="unfall-klasse-map">Unfall mit Schwerverletzten (Klasse 1)</span>
+                    <span class="unfall-klasse-map"
+                        >Unfall mit Schwerverletzten (Klasse 1)</span
+                    >
                 </div>
                 <div class="legend-item">
                     <div class="square yellow"></div>
-                    <span class="unfall-klasse-map">Unfall mit Leichtverletzten (Klasse 2)</span>
+                    <span class="unfall-klasse-map"
+                        >Unfall mit Leichtverletzten (Klasse 2)</span
+                    >
                 </div>
             </div>
         </section>
@@ -193,6 +207,7 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""
         ></script>
+        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
         <script src="script.js"></script>

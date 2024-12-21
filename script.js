@@ -1,5 +1,6 @@
 // Initialize the map using Leaflet.js
 let filterOptions;
+
 const initializeMap = () => {
     const map = L.map("map").setView([50.0, 8.25], 12);
 
@@ -25,7 +26,8 @@ const modal = document.getElementById("shap-modal");
 const overlay = document.getElementById("modal-overlay");
 // Global variables
 let filteredData = [];
-let currentClassType = "";
+let classType = null;
+let currentClassType = null
 let activeFilters = [];
 let originalData = [];
 
@@ -512,6 +514,174 @@ function applyFiltersWithUncertainty() {
     ).textContent = `Gesamtpunkte: (${currentClassType}): ${filteredData.length}`;
 }
 
+// function updateMap(filteredData, classType) {
+//     // حذف تمام لایه‌های موجود
+//     map.eachLayer((layer) => {
+//         if (!layer._url) {
+//             map.removeLayer(layer);
+//         }
+//     });
+
+//     // افزودن لایه جدید OpenStreetMap
+//     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+//         attribution: "© OpenStreetMap contributors",
+//         maxZoom: 18,
+//     }).addTo(map);
+
+//     // پیمایش داده‌های فیلتر شده
+//     filteredData.forEach((item) => {
+//         const latLng = [item.Latitude, item.Longitude];
+//         // console.log("Processing item:", item);
+
+//         if (classType === "wahr") {
+//             // در حالت wahr، نمایش دایره‌های ساده
+//             const classValue = item["Unfallklasse Wahr"];
+//             const color = mapSeverityToColor(classValue, classType);
+
+//             const marker = L.circleMarker(latLng, {
+//                 radius: 10,
+//                 color: color,
+//                 fillColor: color,
+//                 fillOpacity: 0.9,
+//             });
+            
+
+
+//             marker.bindTooltip(
+//                 `
+//                 <div style="font-size: 14px; line-height: 1.4;">
+//                     <strong>Position:</strong> (${item.Latitude.toFixed(4)}, ${item.Longitude.toFixed(4)})<br>
+//                     <strong>Jahr:</strong> ${item.Jahr || "N/A"}<br>
+//                     <strong>Monat:</strong> ${getMonthName(item.Monat) || "N/A"}<br>
+//                     <strong>TagKategorie:</strong> ${getTagKategorieName(item.TagKategorie.toString()) || "N/A"}<br>
+//                     <strong>Zeit:</strong> ${item.Stunde || "N/A"}:00 Uhr<br>
+//                     <strong>Schweregrad:</strong> ${getUnfallklasseName(item["Unfallklasse Wahr"])}<br>
+//                 </div>
+//                 `,
+//                 { permanent: false, direction: "top" }
+//             );
+            
+
+//             marker.addTo(map);
+//         } else if (classType === "bestimmt") {
+//             // در حالت bestimmt، نمایش مقادیر با بازه رنگی
+//             const wahrValue = item["Unfallklasse Wahr"];
+//             const bestimmtValue = item["Unfallklasse Bestimmt"];
+//             const isCorrect = wahrValue === bestimmtValue;
+
+//             const sicherheitScore = parseFloat(item["Unsicherheits-Score"]);
+//             const color = getColorForSicherheit(sicherheitScore, isCorrect);
+
+//             const marker = L.divIcon({
+//                 className: "custom-icon",
+//                 html: `
+//                     <div class="custom-marker" 
+//                         style="
+//                             --bg-color: ${color};
+//                             --text-color: ${item["Unsicherheits-Score"] < 0.5 ? 'black' : 'white'};
+//                             border: 2px solid ${isCorrect ? '#00FF00' : '#FF0000'};
+//                             font-size: 14px;
+//                             font-weight: bold;
+//                             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+//                         ">
+//                         ${isCorrect ? "+" : "-"}
+//                     </div>
+//                 `,
+//                 iconSize: [28, 28],
+//                 iconAnchor: [14, 14],
+//             });
+            
+            
+                
+            
+
+//             const mapMarker = L.marker(latLng, { icon: marker });
+//             const class0Prob =
+//                 safeParseFloat(item["Wahrscheinlichkeit Klasse 0"]) / 100;
+//             const class1Prob =
+//                 safeParseFloat(item["Wahrscheinlichkeit Klasse 1"]) / 100;
+//             const class2Prob =
+//                 safeParseFloat(item["Wahrscheinlichkeit Klasse 2"]) / 100;
+
+//             // Bind Tooltip for Hover
+//             mapMarker.bindTooltip(
+//                 `
+//                 <strong>Jahr:</strong> ${item.Jahr}<br>
+//                 <strong>Monat:</strong> ${item.Monat}<br>
+//                 <strong>Wahr:</strong> ${wahrValue}<br>
+//                 <strong>Bestimmt:</strong> ${bestimmtValue}<br>
+//                 <strong>Unsicherheits:</strong> ${sicherheitScore.toFixed(2)}<br>
+//                 <strong>Treffer:</strong> ${isCorrect ? "Korrekt" : "InKorrekt"}
+//                 <br>
+//                 <div style="font-size: 12px; width: 280px;">
+//                     <div>
+//                         <strong>Klasse 0:</strong>
+//                         <div class='hover-bestimmt' style="
+//                             display: inline-block; 
+//                             background-color: ${getGrayShade(class0Prob)};
+//                             height: 10px; 
+//                             width: ${class0Prob * 100}%; 
+//                             max-width: 100%; 
+//                             border-radius: 3px;">
+//                         </div> ${Math.round(class0Prob * 100)}%
+//                         <br>
+//                         <strong>Klasse 1:</strong>
+//                         <div class='hover-bestimmt' style="
+//                             display: inline-block; 
+//                             background-color: ${getGrayShade(class1Prob)};
+//                             height: 10px; 
+//                             width: ${class1Prob * 100}%; 
+//                             max-width: 100%; 
+//                             border-radius: 3px;">
+//                         </div> ${Math.round(class1Prob * 100)}%
+//                         <br>
+//                         <strong>Klasse 2:</strong>
+//                         <div class='hover-bestimmt' style="
+//                             display: inline-block; 
+//                             background-color: ${getGrayShade(class2Prob)};
+//                             height: 10px; 
+//                             width: ${class2Prob * 100}%; 
+//                             max-width: 100%; 
+//                             border-radius: 3px;">
+//                         </div> ${Math.round(class2Prob * 100)}%
+//                     </div>
+//                 </div>
+//                 `,
+//                 { permanent: false, direction: "top" }
+//             );
+
+//             mapMarker.on("click", () => {
+//                 // استخراج SHAP Values برای همه کلاس‌ها
+//                 const shapValuesClass0 = extractSHAPValues(item, 0).shapValues;
+//                 const shapValuesClass1 = extractSHAPValues(item, 1).shapValues;
+//                 const shapValuesClass2 = extractSHAPValues(item, 2).shapValues;
+
+//                 // باز کردن مودال
+//                 showSHAPModal(item);
+
+//                 // اطمینان از آماده بودن DOM قبل از رسم نمودار
+//                 const checkContainer = setInterval(() => {
+//                     const container = document.getElementById(
+//                         "shap-chart-container"
+//                     );
+//                     if (container) {
+//                         clearInterval(checkContainer); // متوقف کردن بررسی
+
+//                         // رسم نمودار برای همه کلاس‌ها در مودال
+//                         renderGroupedSHAPGraph(
+//                             shapValuesClass0,
+//                             shapValuesClass1,
+//                             shapValuesClass2,
+//                             "shap-chart-container"
+//                         );
+//                     }
+//                 }, 50); // بررسی هر 50 میلی‌ثانیه برای آماده بودن DOM
+//             });
+
+//             mapMarker.addTo(map);
+//         }
+//     });
+// }
 function updateMap(filteredData, classType) {
     // حذف تمام لایه‌های موجود
     map.eachLayer((layer) => {
@@ -526,159 +696,49 @@ function updateMap(filteredData, classType) {
         maxZoom: 18,
     }).addTo(map);
 
+    if (!filteredData || filteredData.length === 0) {
+        console.log("هیچ داده‌ای برای نمایش وجود ندارد.");
+        return; // از ادامه اجرا جلوگیری می‌کند
+    }
+
+    // ایجاد گروه خوشه‌بندی
+    const markers = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        maxClusterRadius: 50, // شعاع خوشه
+        iconCreateFunction: function (cluster) {
+            const count = cluster.getChildCount();
+            const size = count < 10 ? 30 : count < 50 ? 40 : 50; // تنظیم اندازه خوشه
+            const color = count > 50 ? "red" : count > 20 ? "orange" : "green";
+
+            return L.divIcon({
+                html: `<div style="
+                        background-color: ${color};
+                        width: ${size}px;
+                        height: ${size}px;
+                        border-radius: 50%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: white;
+                        font-size: 14px;
+                        font-weight: bold;">${count}</div>`,
+                className: "custom-cluster-icon",
+                iconSize: [size, size],
+            });
+        },
+    });
+
     // پیمایش داده‌های فیلتر شده
+    if (classType === null) {
+        filteredData = [];
+    }
     filteredData.forEach((item) => {
         const latLng = [item.Latitude, item.Longitude];
-        // console.log("Processing item:", item);
-
-        if (classType === "wahr") {
-            // در حالت wahr، نمایش دایره‌های ساده
-            const classValue = item["Unfallklasse Wahr"];
-            const color = mapSeverityToColor(classValue, classType);
-
-            const marker = L.circleMarker(latLng, {
-                radius: 10,
-                color: color,
-                fillColor: color,
-                fillOpacity: 0.9,
-            });
-            
-
-
-            marker.bindTooltip(
-                `
-                <div style="font-size: 14px; line-height: 1.4;">
-                    <strong>Position:</strong> (${item.Latitude.toFixed(4)}, ${item.Longitude.toFixed(4)})<br>
-                    <strong>Jahr:</strong> ${item.Jahr || "N/A"}<br>
-                    <strong>Monat:</strong> ${getMonthName(item.Monat) || "N/A"}<br>
-                    <strong>TagKategorie:</strong> ${getTagKategorieName(item.TagKategorie.toString()) || "N/A"}<br>
-                    <strong>Zeit:</strong> ${item.Stunde || "N/A"}:00 Uhr<br>
-                    <strong>Schweregrad:</strong> ${getUnfallklasseName(item["Unfallklasse Wahr"])}<br>
-                </div>
-                `,
-                { permanent: false, direction: "top" }
-            );
-            
-
-            marker.addTo(map);
-        } else if (classType === "bestimmt") {
-            // در حالت bestimmt، نمایش مقادیر با بازه رنگی
-            const wahrValue = item["Unfallklasse Wahr"];
-            const bestimmtValue = item["Unfallklasse Bestimmt"];
-            const isCorrect = wahrValue === bestimmtValue;
-
-            const sicherheitScore = parseFloat(item["Unsicherheits-Score"]);
-            const color = getColorForSicherheit(sicherheitScore, isCorrect);
-
-            const marker = L.divIcon({
-                className: "custom-icon",
-                html: `
-                    <div class="custom-marker" 
-                        style="
-                            --bg-color: ${color};
-                            --text-color: ${item["Unsicherheits-Score"] < 0.5 ? 'black' : 'white'};
-                            border: 2px solid ${isCorrect ? '#00FF00' : '#FF0000'};
-                            font-size: 14px;
-                            font-weight: bold;
-                            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-                        ">
-                        ${isCorrect ? "+" : "-"}
-                    </div>
-                `,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14],
-            });
-            
-            
-                
-            
-
-            const mapMarker = L.marker(latLng, { icon: marker });
-            const class0Prob =
-                safeParseFloat(item["Wahrscheinlichkeit Klasse 0"]) / 100;
-            const class1Prob =
-                safeParseFloat(item["Wahrscheinlichkeit Klasse 1"]) / 100;
-            const class2Prob =
-                safeParseFloat(item["Wahrscheinlichkeit Klasse 2"]) / 100;
-
-            // Bind Tooltip for Hover
-            mapMarker.bindTooltip(
-                `
-                <strong>Jahr:</strong> ${item.Jahr}<br>
-                <strong>Monat:</strong> ${item.Monat}<br>
-                <strong>Wahr:</strong> ${wahrValue}<br>
-                <strong>Bestimmt:</strong> ${bestimmtValue}<br>
-                <strong>Unsicherheits:</strong> ${sicherheitScore.toFixed(2)}<br>
-                <strong>Treffer:</strong> ${isCorrect ? "Korrekt" : "InKorrekt"}
-                <br>
-                <div style="font-size: 12px; width: 280px;">
-                    <div>
-                        <strong>Klasse 0:</strong>
-                        <div class='hover-bestimmt' style="
-                            display: inline-block; 
-                            background-color: ${getGrayShade(class0Prob)};
-                            height: 10px; 
-                            width: ${class0Prob * 100}%; 
-                            max-width: 100%; 
-                            border-radius: 3px;">
-                        </div> ${Math.round(class0Prob * 100)}%
-                        <br>
-                        <strong>Klasse 1:</strong>
-                        <div class='hover-bestimmt' style="
-                            display: inline-block; 
-                            background-color: ${getGrayShade(class1Prob)};
-                            height: 10px; 
-                            width: ${class1Prob * 100}%; 
-                            max-width: 100%; 
-                            border-radius: 3px;">
-                        </div> ${Math.round(class1Prob * 100)}%
-                        <br>
-                        <strong>Klasse 2:</strong>
-                        <div class='hover-bestimmt' style="
-                            display: inline-block; 
-                            background-color: ${getGrayShade(class2Prob)};
-                            height: 10px; 
-                            width: ${class2Prob * 100}%; 
-                            max-width: 100%; 
-                            border-radius: 3px;">
-                        </div> ${Math.round(class2Prob * 100)}%
-                    </div>
-                </div>
-                `,
-                { permanent: false, direction: "top" }
-            );
-
-            mapMarker.on("click", () => {
-                // استخراج SHAP Values برای همه کلاس‌ها
-                const shapValuesClass0 = extractSHAPValues(item, 0).shapValues;
-                const shapValuesClass1 = extractSHAPValues(item, 1).shapValues;
-                const shapValuesClass2 = extractSHAPValues(item, 2).shapValues;
-
-                // باز کردن مودال
-                showSHAPModal(item);
-
-                // اطمینان از آماده بودن DOM قبل از رسم نمودار
-                const checkContainer = setInterval(() => {
-                    const container = document.getElementById(
-                        "shap-chart-container"
-                    );
-                    if (container) {
-                        clearInterval(checkContainer); // متوقف کردن بررسی
-
-                        // رسم نمودار برای همه کلاس‌ها در مودال
-                        renderGroupedSHAPGraph(
-                            shapValuesClass0,
-                            shapValuesClass1,
-                            shapValuesClass2,
-                            "shap-chart-container"
-                        );
-                    }
-                }, 50); // بررسی هر 50 میلی‌ثانیه برای آماده بودن DOM
-            });
-
-            mapMarker.addTo(map);
-        }
+        const marker = createMarker(latLng, item, classType);
+        markers.addLayer(marker);
     });
+    map.addLayer(markers);
 }
 
 function createColorLegend() {
@@ -1148,5 +1208,73 @@ function mapSeverityToBorderColor(classValue) {
             return "#CCCC00"; // تیره‌تر برای زرد
         default:
             return "#666666"; // خاکستری برای پیش‌فرض
+    }
+}
+
+// تابع برای ایجاد نقاط
+function createMarker(latLng, item, classType) {
+    let marker;
+    if (classType === "wahr") {
+        const classValue = item["Unfallklasse Wahr"];
+        const color = mapSeverityToColor(classValue, classType);
+        marker = L.circleMarker(latLng, {
+            radius: 10,
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.9,
+        });
+    } else if (classType === "bestimmt") {
+        const wahrValue = item["Unfallklasse Wahr"];
+        const bestimmtValue = item["Unfallklasse Bestimmt"];
+        const isCorrect = wahrValue === bestimmtValue;
+        const sicherheitScore = parseFloat(item["Unsicherheits-Score"]);
+        const color = getColorForSicherheit(sicherheitScore, isCorrect);
+        marker = L.marker(latLng, {
+            icon: L.divIcon({
+                className: "custom-icon",
+                html: `<div class="custom-marker" style="
+                    --bg-color: ${color};
+                    --text-color: ${isCorrect ? "black" : "white"};
+                    border: 2px solid ${isCorrect ? "#00FF00" : "#FF0000"};
+                    font-size: 14px;
+                    font-weight: bold;">
+                    ${isCorrect ? "+" : "-"}
+                </div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14],
+            }),
+        });
+    }
+    if (classType){
+        marker.bindTooltip(generateTooltip(item, classType), { direction: "top" });
+    }
+    
+    return marker;
+}
+
+// تابع برای تولید توضیحات (Tooltip)
+function generateTooltip(item, classType) {
+    if (classType === "wahr") {
+        return `
+            <div>
+                <strong>Position:</strong> (${item.Latitude.toFixed(4)}, ${item.Longitude.toFixed(4)})<br>
+                <strong>Jahr:</strong> ${item.Jahr || "N/A"}<br>
+                <strong>Monat:</strong> ${getMonthName(item.Monat) || "N/A"}<br>
+                <strong>Schweregrad:</strong> ${getUnfallklasseName(item["Unfallklasse Wahr"])}<br>
+            </div>
+        `;
+    } else if(classType === "bestimmt"){
+        const wahrValue = item["Unfallklasse Wahr"];
+        const bestimmtValue = item["Unfallklasse Bestimmt"];
+        const sicherheitScore = parseFloat(item["Unsicherheits-Score"]);
+        return `
+            <div>
+                <strong>Jahr:</strong> ${item.Jahr}<br>
+                <strong>Monat:</strong> ${item.Monat}<br>
+                <strong>Wahr:</strong> ${wahrValue}<br>
+                <strong>Bestimmt:</strong> ${bestimmtValue}<br>
+                <strong>Unsicherheits:</strong> ${sicherheitScore.toFixed(2)}<br>
+            </div>
+        `;
     }
 }
