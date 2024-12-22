@@ -517,7 +517,7 @@ function updateMap(filteredData, classType) {
     }).addTo(map);
 
     if (!filteredData || filteredData.length === 0) {
-        console.log("هیچ داده‌ای برای نمایش وجود ندارد.");
+        console.log("Nothing to show");
         return; // از ادامه اجرا جلوگیری می‌کند
     }
 
@@ -690,6 +690,21 @@ function mapSeverityToColor(classValue, classType) {
                 return "#FFF700"; // Light (golden yellow)
             default:
                 return "#606060"; // Default (dark gray)
+        }
+    }
+}
+
+function mapSeverityToBorderColor(classValue) {
+    if (classType === "wahr") {
+        switch (classValue) {
+            case 0:
+                return "#800000"; // تیره‌تر برای قرمز
+            case 1:
+                return "#CC8400"; // تیره‌تر برای نارنجی
+            case 2:
+                return "#CCCC00"; // تیره‌تر برای زرد
+            default:
+                return "#666666"; // خاکستری برای پیش‌فرض
         }
     }
 }
@@ -1006,32 +1021,6 @@ function closeModal() {
     overlay.style.display = "none";
 }
 
-function getRadiusBySeverity(classValue) {
-    switch (classValue) {
-        case 0:
-            return 10; // Fatal - بزرگ‌تر
-        case 1:
-            return 8; // Severe - متوسط
-        case 2:
-            return 6; // Light - کوچک‌تر
-        default:
-            return 5;
-    }
-}
-
-function mapSeverityToBorderColor(classValue) {
-    switch (classValue) {
-        case 0:
-            return "#800000"; // تیره‌تر برای قرمز
-        case 1:
-            return "#CC8400"; // تیره‌تر برای نارنجی
-        case 2:
-            return "#CCCC00"; // تیره‌تر برای زرد
-        default:
-            return "#666666"; // خاکستری برای پیش‌فرض
-    }
-}
-
 // تابع برای ایجاد نقاط
 function createMarker(latLng, item, classType) {
     let marker;
@@ -1039,10 +1028,10 @@ function createMarker(latLng, item, classType) {
         const classValue = item["Unfallklasse Wahr"];
         const color = mapSeverityToColor(classValue, classType);
         marker = L.circleMarker(latLng, {
-            radius: 10,
+            radius: 11,
             color: color,
             fillColor: color,
-            fillOpacity: 0.9,
+            fillOpacity: 0.7,
         });
     } else if (classType === "bestimmt") {
         const wahrValue = item["Unfallklasse Wahr"];
@@ -1063,9 +1052,6 @@ function createMarker(latLng, item, classType) {
                 iconAnchor: [14, 14],
             }),
         });
-    }
-    if (classType){
-        marker.bindTooltip(generateTooltip(item, classType), {permanent: false, direction: "top" });
         marker.on("click", () => {
             // استخراج SHAP Values برای همه کلاس‌ها
             const shapValuesClass0 = extractSHAPValues(item, 0).shapValues;
@@ -1093,6 +1079,9 @@ function createMarker(latLng, item, classType) {
                 }
             }, 50); // بررسی هر 50 میلی‌ثانیه برای آماده بودن DOM
         });
+    }
+    if (classType){
+        marker.bindTooltip(generateTooltip(item, classType), {permanent: false, direction: "top" });
     }
     
     return marker;

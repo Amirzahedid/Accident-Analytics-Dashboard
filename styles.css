@@ -778,8 +778,8 @@ div.hover-bestimmt {
     background-color: var(--bg-color, #f0f0f0);
     color: var(--text-color, white);
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
