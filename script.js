@@ -528,15 +528,23 @@ function updateMap(filteredData, classType) {
         zoomToBoundsOnClick: true,
         maxClusterRadius: 40, // شعاع خوشه
         spiderfyOnMaxZoom: true, // نمایش نقاط به صورت مجزا در بیشترین زوم
-        maxZoom: 19, // تنظیم حداکثر زوم
+        maxZoom: 19, // تنظیم حداکثر زوم        
         iconCreateFunction: function (cluster) {
             const count = cluster.getChildCount();
+            const points = cluster.getAllChildMarkers().map(marker => marker.options.data); // داده‌های داخل خوشه
+            // const averageSeverity = calculateAverageSeverity(points);
+            // const clusterColor = getClusterColor(averageSeverity);
             const size = count < 10 ? 30 : count < 50 ? 40 : 50; // تنظیم اندازه خوشه
-            const color = count > 50 ? "red" : count > 20 ? "orange" : "green";
-
+            let averageColor;
+            if (classType === "wahr") {
+                const averageSeverity = calculateAverageSeverity(points);
+                averageColor = getClusterColor(averageSeverity); // استفاده از میانگین شدت
+            } else if (classType === "bestimmt") {
+                averageColor = calculateAverageClusterColorForBestimmt(points); // تابع محاسبه میانگین برای bestimmt
+            }
             return L.divIcon({
                 html: `<div style="
-                        background-color: ${color};
+                        background-color: ${averageColor};
                         width: ${size}px;
                         height: ${size}px;
                         border-radius: 50%;
@@ -545,11 +553,12 @@ function updateMap(filteredData, classType) {
                         align-items: center;
                         color: white;
                         font-size: 14px;
-                        font-weight: bold;">${count}</div>`,
+                        font-weight: bold;">
+                        ${count}</div>`,
                 className: "custom-cluster-icon",
                 iconSize: [size, size],
             });
-        },
+        }
     });
 
     // پیمایش داده‌های فیلتر شده
@@ -929,10 +938,6 @@ function showSHAPModal(item) {
     const shapValuesClass1 = extractSHAPValues(item, 1).shapValues;
     const shapValuesClass2 = extractSHAPValues(item, 2).shapValues;
 
-    console.log("SHAP Values Class 0:", shapValuesClass0);
-    console.log("SHAP Values Class 1:", shapValuesClass1);
-    console.log("SHAP Values Class 2:", shapValuesClass2);
-
     // نمایش Overlay و Modal
     overlay.style.display = "block";
     modal.style.display = "block";
@@ -1028,6 +1033,7 @@ function createMarker(latLng, item, classType) {
         const classValue = item["Unfallklasse Wahr"];
         const color = mapSeverityToColor(classValue, classType);
         marker = L.circleMarker(latLng, {
+            data: item,
             radius: 11,
             color: color,
             fillColor: color,
@@ -1040,6 +1046,7 @@ function createMarker(latLng, item, classType) {
         const sicherheitScore = parseFloat(item["Unsicherheits-Score"]);
         const color = getColorForSicherheit(sicherheitScore, isCorrect);
         marker = L.marker(latLng, {
+            data: item,
             icon: L.divIcon({
                 className: "custom-icon",
                 html: `<div class="custom-marker" style="
@@ -1152,4 +1159,38 @@ function generateTooltip(item, classType) {
             </div>
         `;
     }
+}
+
+function getClusterColor(averageSeverity) {
+    const colorScale = d3.scaleLinear()
+        .domain([0, 1, 2]) // شدت کم (0)، متوسط (1)، و شدید (2)
+        .range(["#D70000", "#FF8C00", "#FFF700"]); // رنگ‌های شما
+
+    return colorScale(averageSeverity);
+}
+
+function calculateAverageSeverity(points) {
+    const totalSeverity = points.reduce((sum, point) => sum + point["Unfallklasse Wahr"], 0);
+    return totalSeverity / points.length;
+}
+
+function calculateAverageClusterColorForBestimmt(points) {
+    let totalR = 0, totalG = 0, totalB = 0;
+
+    points.forEach(point => {
+        const sicherheitScore = point["Unsicherheits-Score"];
+        const isCorrect = point["Unfallklasse Wahr"] === point["Unfallklasse Bestimmt"];
+        const color = d3.color(getColorForSicherheit(sicherheitScore, isCorrect)); // رنگ هر نقطه
+
+        totalR += color.r;
+        totalG += color.g;
+        totalB += color.b;
+    });
+
+    const count = points.length;
+    const avgR = Math.round(totalR / count);
+    const avgG = Math.round(totalG / count);
+    const avgB = Math.round(totalB / count);
+
+    return `rgb(${avgR}, ${avgG}, ${avgB})`;
 }
