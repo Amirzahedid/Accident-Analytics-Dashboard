@@ -703,15 +703,15 @@ function mapSeverityToColor(classValue, classType) {
     }
 }
 
-function mapSeverityToBorderColor(classValue) {
+function mapSeverityToBorderColor(classValue, classType) {
     if (classType === "wahr") {
         switch (classValue) {
             case 0:
-                return "#800000"; // تیره‌تر برای قرمز
+                return "#FF0000"; // قرمز روشن‌تر
             case 1:
-                return "#CC8400"; // تیره‌تر برای نارنجی
+                return "#FFA500"; // نارنجی روشن‌تر
             case 2:
-                return "#CCCC00"; // تیره‌تر برای زرد
+                return "#FFFF00"; // زرد خالص // تیره‌تر برای زرد
             default:
                 return "#666666"; // خاکستری برای پیش‌فرض
         }
@@ -1032,10 +1032,11 @@ function createMarker(latLng, item, classType) {
     if (classType === "wahr") {
         const classValue = item["Unfallklasse Wahr"];
         const color = mapSeverityToColor(classValue, classType);
+        const borderColor = mapSeverityToBorderColor(classValue, classType)
         marker = L.circleMarker(latLng, {
             data: item,
             radius: 11,
-            color: color,
+            color: borderColor,
             fillColor: color,
             fillOpacity: 0.7,
         });
