@@ -333,6 +333,7 @@ document.getElementById("toggle-wahr").addEventListener("change", (event) => {
         document.getElementById("toggle-bestimmt").checked = false;
         document.getElementById("safety-settings").style.display = "none";
         document.getElementById('map-farbe').style.display = "block";
+        document.getElementById('isCorrect-filters').style.display = 'none';
         filterShow.style.display = "block";
         createColorLegend();
         applyFiltersWithUncertainty();
@@ -347,6 +348,7 @@ document
             document.getElementById("toggle-wahr").checked = false;
             document.getElementById("safety-settings").style.display = "block";
             document.getElementById('map-farbe').style.display = "none";
+            document.getElementById('isCorrect-filters').style.display = 'block';
             filterShow.style.display = "block";
             applyFiltersWithUncertainty();
         }
@@ -413,7 +415,8 @@ function applyFiltersWithUncertainty() {
         ).textContent = `Total Points: 0`;
         return;
     }
-    // گام 1: فیلتر کردن براساس نوع کلاس (wahr یا bestimmt)
+
+    // Step 1: Filter by class type (wahr or bestimmt)
     let filteredDataByClass = originalData.filter(
         (item) =>
             item[
@@ -424,7 +427,7 @@ function applyFiltersWithUncertainty() {
             ] !== null
     );
 
-    // گام 2: اعمال فیلترهای Unsicherheits-Score فقط در حالت bestimmt
+    // Step 2: Apply uncertainty score filters only for bestimmt
     if (currentClassType === "bestimmt") {
         const lowThreshold =
             parseFloat(document.getElementById("low-threshold").value) / 100;
@@ -441,7 +444,7 @@ function applyFiltersWithUncertainty() {
         });
     }
 
-    // گام 3: اعمال فیلترهای پویا
+    // Step 3: Apply dynamic filters
     const filterMapping = {
         jahr: "Jahr",
         monat: "Monat",
@@ -459,44 +462,46 @@ function applyFiltersWithUncertainty() {
         stadtteil: "Stadtteil",
         unfallklasse: 'Unfallklasse Wahr',
         unfallklasseb: 'Unfallklasse Bestimmt',
-        tagkategorie: 'TagKategorie'
+        tagkategorie: 'TagKategorie',
     };
-    let dataKey
+
     activeFilters.forEach((filter) => {
-        if (filter.category === 'unfallklasse') {
-            if (currentClassType === 'wahr') {
-                dataKey = filterMapping[filter.category];
-            } else if (currentClassType === 'bestimmt') {
-                dataKey = filterMapping['unfallklasseb']
-            }
+        if (filter.category === "isCorrect") {
+            filteredDataByClass = filteredDataByClass.filter((item) => {
+                const wahrValue = item["Unfallklasse Wahr"];
+                const bestimmtValue = item["Unfallklasse Bestimmt"];
+                const isCorrect = wahrValue === bestimmtValue;
+                return filter.values.includes(isCorrect.toString());
+            });
         } else {
-            dataKey = filterMapping[filter.category];
-        }
-        if (!dataKey) {
-            console.warn(`No mapping found for category: ${filter.category}`);
-            return;
-        }
+            const dataKey = filterMapping[filter.category];
 
-        filteredDataByClass = filteredDataByClass.filter((item) => {
-            const value = item[dataKey];
-            if (value === null || value === undefined) {
-                console.log(
-                    `Skipping item due to missing value in category: ${dataKey}`
-                );
-                return false;
+            if (!dataKey) {
+                console.warn(`No mapping found for category: ${filter.category}`);
+                return;
             }
 
-            const stringValue = value.toString();
-            const isMatch = filter.values.includes(stringValue);
-            return isMatch;
-        });
+            filteredDataByClass = filteredDataByClass.filter((item) => {
+                const value = item[dataKey];
+
+                if (value === null || value === undefined) {
+                    console.log(
+                        `Skipping item due to missing value in category: ${dataKey}`
+                    );
+                    return false;
+                }
+
+                const stringValue = value.toString();
+                return filter.values.includes(stringValue);
+            });
+        }
     });
 
-    // گام 4: ذخیره و به‌روزرسانی نقشه
+    // Step 4: Update map
     filteredData = filteredDataByClass;
     updateMap(filteredData, currentClassType);
 
-    // نمایش تعداد نقاط فیلتر شده
+    // Update filtered count
     document.getElementById(
         "filtered-count"
     ).textContent = `Gesamtpunkte: (${currentClassType}): ${filteredData.length}`;
@@ -1195,3 +1200,33 @@ function calculateAverageClusterColorForBestimmt(points) {
 
     return `rgb(${avgR}, ${avgG}, ${avgB})`;
 }
+
+
+function addFilter(category, values) {
+    // بررسی وجود فیلتر در activeFilters
+    const existingFilter = activeFilters.find((filter) => filter.category === category);
+
+    if (existingFilter && values !== existingFilter.values) {
+        // اگر فیلتر وجود دارد، مقادیر جدید را جایگزین کنید
+        existingFilter.values = values;
+    } else {
+        // اگر فیلتر وجود ندارد، آن را اضافه کنید
+        activeFilters.push({ category, values });
+    }
+
+    // به‌روزرسانی UI و اعمال فیلترها
+    updateActiveFiltersUI();
+    applyFiltersWithUncertainty();
+}
+
+document.getElementById("filter-correct").addEventListener("click", () => {
+    if (currentClassType === 'bestimmt'){
+        addFilter("isCorrect", ["true"]);
+    }    
+});
+
+document.getElementById("filter-incorrect").addEventListener("click", () => {
+    if (currentClassType === 'bestimmt'){
+        addFilter("isCorrect", ["false"]);
+    }
+});

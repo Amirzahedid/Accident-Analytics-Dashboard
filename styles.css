@@ -366,7 +366,7 @@ button {
 /* استایل کلی برای لیست Active Filters */
 #active-filters {
     list-style: none; /* حذف نقطه‌های پیش‌فرض لیست */
-    padding: 0;
+    padding: 10px;
     margin: 0;
 }
 
@@ -842,4 +842,58 @@ div.hover-bestimmt {
     color: white;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#isCorrect-filters {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#isCorrect-filters h2 {
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#isCorrect-filters button {
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 90%; /* تطبیق دکمه‌ها با اندازه بخش */
+    text-align: center;
+}
+
+#isCorrect-filters button:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#isCorrect-filters button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 120, 215, 0.4);
+}
+
+#active-filters-container {
+    max-height: 200px; /* محدود کردن ارتفاع */
+    overflow-y: auto; /* فعال کردن اسکرول عمودی */
+    padding-right: 10px; /* فضای اضافی برای اسکرول */
+    border: 1px solid #ccc; /* حاشیه برای نمایش بهتر */
+    border-radius: 5px;
+    background-color: #f9f9f9; /* رنگ پس‌زمینه */
+    margin-bottom: 10px; /* فاصله از عناصر دیگر */
 }

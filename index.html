@@ -105,12 +105,19 @@
 
             <!-- Add filter button -->
             <button id="add-filter">Filter hinzufügen</button>
-
+            <br />
+            <div id="isCorrect-filters" style="display: none">
+                <h2>Filter nach Korrektheit</h2>
+                <button id="filter-correct">Nur Korrekte Vorhersagen</button>
+                <button id="filter-incorrect">Nur Falsche Vorhersagen</button>
+            </div>
             <!-- List of active filters -->
             <h3>Aktiven Filter:</h3>
-            <ul id="active-filters">
-                <!-- Active filters will be dynamically added here -->
-            </ul>
+            <div id="active-filters-container">
+                <ul id="active-filters">
+                    <!-- Active filters will be dynamically added here -->
+                </ul>
+            </div>
 
             <!-- Section for displaying filtered count -->
             <p id="filtered-count">Gesamtpunkte: 0</p>
