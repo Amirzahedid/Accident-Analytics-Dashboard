@@ -19,7 +19,7 @@ Das Dashboard bietet:
 ## Installation
 1. Repository klonen:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Amirzahedid/Accident-Analytics-Dashboard.git
    ```
 2. Abhängigkeiten installieren:
    Es sind keine zusätzlichen Installationen erforderlich. Der Code nutzt externe Bibliotheken über CDN.
